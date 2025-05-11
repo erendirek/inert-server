@@ -1,6 +1,4 @@
 pub mod routes;
-pub mod handlers;
-
-pub fn test() {
-    
-}
+pub mod utils;
+pub mod errors;
+pub mod database;

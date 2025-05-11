@@ -1,9 +1,11 @@
-use axum::{Router, routing::get};
-use crate::handlers::rest_handlers::handle_index_get;
+pub mod auth;
 
-pub fn setup_rest_router() -> Router{
+use auth::setup_rest_auth_router;
+use axum::Router;
+
+pub fn setup_rest_index_router() -> Router{
     let router = Router::new()
-        .route("/", get(handle_index_get));
+        .nest("/auth", setup_rest_auth_router());
 
     router
 }
