@@ -5,9 +5,9 @@ use bb8_postgres::PostgresConnectionManager;
 use postgres::{tls::NoTlsStream, Error, Socket};
 use tokio_postgres::{self, Client, Connection, NoTls};
 
-pub type DBPool = Pool<PostgresConnectionManager<NoTls>>;
+pub type DBPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
 
-pub async fn create_db_pool() -> Result<Arc<DBPool>, Error> {
+pub async fn create_db_pool() -> Result<DBPool, Error> {
     let cfg = "host=localhost user=postgres password=iamyaten dbname=inert";
     let mgr = PostgresConnectionManager::new_from_stringlike(cfg, NoTls)?;
     
@@ -15,7 +15,7 @@ pub async fn create_db_pool() -> Result<Arc<DBPool>, Error> {
 
     println!("DATABASE connection success");
 
-    let dbp: Arc<DBPool> = Arc::new(pool);
+    let dbp = Arc::new(pool);
 
     Ok(dbp)
 }

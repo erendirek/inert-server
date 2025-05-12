@@ -1,19 +1,21 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::sync::{Arc, Mutex};
 use axum::{Extension, Router};
 
-use dotenv::dotenv;
 use inert::{database::create_db_pool, routes::rest::setup_rest_index_router};
+use inert::utils::env_loader::{load_env_variables, EnvVars};
 
 #[tokio::main]
 async fn main() -> Result<(), &'static str>{
-    // Load ENV
-    dotenv().unwrap();
 
+    let vars: EnvVars = load_env_variables();
+    
     let dbp_shared_state = create_db_pool().await.unwrap();
     
     let app = Router::new()
-        .nest("/rest", setup_rest_index_router())
-        .layer(Extension(dbp_shared_state));
+        .nest("/api/rest", setup_rest_index_router())
+        .layer(Extension(dbp_shared_state))
+        .layer(Extension(vars));
 
     let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080);
     println!("listening on {}", addr);

@@ -5,8 +5,8 @@ Bu belge, Discord tarzı bir sohbet uygulaması için hem REST API hem de WebSoc
 ## Genel
 
 - **API Versiyonu:** v1
-- **REST Base URL:** `https://yourhost.com/api/v1`
-- **WebSocket URL:** `wss://yourhost.com/api/v1/ws`
+- **REST Base URL:** `https://yourhost.com/api/rest`
+- **WebSocket URL:** `wss://yourhost.com/api/ws`
 
 ---
 

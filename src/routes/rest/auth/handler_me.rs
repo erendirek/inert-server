@@ -1,5 +1,7 @@
-use axum::response::IntoResponse;
+use axum::{response::IntoResponse, Extension};
 
-pub async fn rest_handle_auth_me() -> impl IntoResponse {
-    "hello from auth me"
+use crate::utils::jwt::UserUUID;
+
+pub async fn get_auth_me(Extension(user_uuid): Extension<UserUUID>) -> impl IntoResponse {
+    format!("hello from auth me {}", user_uuid)
 }

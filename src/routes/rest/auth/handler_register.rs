@@ -1,36 +1,40 @@
-use std::{sync::Arc, time::{SystemTime, UNIX_EPOCH}};
+use std::{env, sync::Arc, time::{Duration, SystemTime, UNIX_EPOCH}};
 
 use axum::{extract::rejection::JsonRejection, response::IntoResponse, Extension, Json};
-use hex::encode;
+use chrono::Utc;
 use hyper::StatusCode;
-use postgres::error::SqlState;
+use jsonwebtoken::{EncodingKey, Header};
 use serde::{Deserialize, Serialize};
 use sha2::{self, Digest};
 
-use crate::{database::DBPool, errors::AppError};
+use crate::{database::DBPool, errors::AppError, utils::{env_loader::EnvVars, jwt::JWTPayload}};
 
-pub async fn rest_handle_auth_post_register(
-    Extension(dbp): Extension<Arc<DBPool>>, 
-    login_payload: Result<Json<AuthRegisterPayload>, JsonRejection>) 
+pub async fn post_auth_post_register(
+    Extension(dbp): Extension<DBPool>,
+    Extension(env_vars): Extension<EnvVars>,
+    register_payload: Result<Json<AuthRegisterPayload>, JsonRejection>) 
         -> Result<impl IntoResponse, AppError> 
 {
-    match login_payload {
+    let token = match register_payload {
         Ok(Json(payload)) => {
-            handle_auth_register_correct_payload(&payload, &dbp).await?;
+            handle_auth_register_correct_payload(&payload, &dbp, &env_vars).await?
         },
 
         Err(err) => {
-            return Err(AppError::InvalidJSONType);
+            println!("{}", err);
+            return Err(AppError::InvalidJsonType("invalid json type".to_string()));
         }
-    }
-
-    Ok(LoginResponse {
-        status_code: StatusCode::OK,
-        msg: "success"
-    })
+    };
+    
+    Ok(
+        AuthRegisterResponse {
+            status_code: StatusCode::OK,
+            p: AuthRegisterResponseContent { msg: "register success".to_string(), token }
+        }
+    )
 }
 
-async fn handle_auth_register_correct_payload(auth_register_payload: &AuthRegisterPayload, dbp: &Arc<DBPool>) -> Result<(), AppError> {
+async fn handle_auth_register_correct_payload(auth_register_payload: &AuthRegisterPayload, dbp: &DBPool, env_vars: &EnvVars) -> Result<String, AppError> {
     let username = auth_register_payload.username.as_str();
     let email = auth_register_payload.email.as_str();
     let pwd = auth_register_payload.password.as_str();
@@ -39,41 +43,39 @@ async fn handle_auth_register_correct_payload(auth_register_payload: &AuthRegist
         Ok(val) => val,
         Err(err) => {
             println!("An error occured : {}", err);
-            return Err(AppError::InternalServerError);
+            return Err(AppError::DatabaseError("database error".to_string()));
         }
     };
 
 
     let sh = sha2::Sha256::digest(pwd.as_bytes()).to_vec();
-    let pwd_hash = encode(sh);
+    let pwd_hash = hex::encode(sh);
 
-    let res = match conn.query("INSERT INTO users (username, email, pwd_hash) VALUES ($1, $2, $3) RETURNING id", &[&username, &email, &pwd_hash]).await {
+    let user = match conn.query("INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id", &[&username, &email, &pwd_hash]).await {
         Ok(val) => val,
         Err(err) => {
-            println!("An error occured : {}", err);
-            return Err(handle_auth_register_db_error(err));
+            println!("{}", err);
+            return Err(AppError::DatabaseError("database error".to_string()));
         }
     };
     
-    let id: uuid::Uuid = res[0].get("id");
-    
-    let myc = JWTClaims {
-        uuid: id.to_string(),
-        exp: SystemTime::now().duration_since(UNIX_EPOCH).expect("time backwards").as_millis()
+    let user_id: uuid::Uuid = match user[0].try_get("id") {
+        Ok(val) => val,
+        Err(err) => {
+            println!("{}", err);
+            return Err(AppError::InternalServerError("internal server error".to_string()));
+        },
     };
+
+    let jwtpayload = JWTPayload {
+        uuid: user_id.to_string(),
+        exp: Utc::now() + Duration::from_secs(60 * 15)
+    };
+
+    let secret = env_vars.get("JWT_KEY").unwrap().as_bytes();
+    let token = jsonwebtoken::encode(&Header::default(), &jwtpayload, &EncodingKey::from_secret(secret)).unwrap();
     
-    Ok(())
-}
-
-fn handle_auth_register_db_error(err: postgres::Error) -> AppError{
-    if let Some(sql_state) = err.code() {
-        match *sql_state {
-            SqlState::UNIQUE_VIOLATION => return AppError::Conflict(err.to_string()),
-            _ => return AppError::InternalServerError
-        }
-    }
-
-    AppError::InternalServerError
+    Ok(token)
 }
 
 #[derive(Deserialize)]
@@ -83,21 +85,21 @@ pub struct AuthRegisterPayload {
     password: String
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-struct JWTClaims {
-    uuid: String,
-    exp: u128
-}
-
-struct LoginResponse {
+struct AuthRegisterResponse {
     status_code: StatusCode,
-    msg: &'static str
+    p: AuthRegisterResponseContent
 }
 
-impl IntoResponse for LoginResponse {
+impl IntoResponse for AuthRegisterResponse {
     fn into_response(self) -> axum::response::Response {
         let status = self.status_code;
-        let msg = self.msg;
-        (status, msg).into_response()
+        let msg = self.p;
+        (status, Json(msg)).into_response()
     }
+}
+
+#[derive(Serialize)]
+struct AuthRegisterResponseContent { 
+    msg: String,
+    token: String 
 }
