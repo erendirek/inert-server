@@ -5,9 +5,14 @@ use bb8_postgres::PostgresConnectionManager;
 use postgres::{tls::NoTlsStream, Error, Socket};
 use tokio_postgres::{self, Client, Connection, NoTls};
 
+use crate::utils::env_loader::EnvVars;
+
 pub type DBPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
 
-pub async fn create_db_pool() -> Result<DBPool, Error> {
+pub async fn create_db_pool(env_vars: EnvVars) -> Result<DBPool, Error> {
+    let postgre_username = env_vars.get("RDS_DB_USERNAME").unwrap();
+    let postgre_password = env_vars.get("RDS_DB_PASSWORD").unwrap();
+    
     let cfg = "host=localhost user=postgres password=iamyaten dbname=inert";
     let mgr = PostgresConnectionManager::new_from_stringlike(cfg, NoTls)?;
     
