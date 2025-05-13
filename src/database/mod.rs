@@ -1,48 +1,31 @@
 pub mod db_test;
 
-use std::{env, fs, io::BufReader, path::{Path, PathBuf}, sync::Arc};
+use std::{env, fs::{self, File}, io::BufReader, path::{Path, PathBuf}, sync::Arc};
 
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
+use native_tls::TlsConnector;
 use postgres::{tls::{MakeTlsConnect, NoTlsStream, TlsConnect}, Error, Socket};
-use rustls::{ClientConfig, RootCertStore};
+use postgres_native_tls::MakeTlsConnector;
 use tokio_postgres::{self, Client, Connection, NoTls};
-use tokio_postgres_rustls::MakeRustlsConnect;
 
 use crate::{errors::AppError, utils::env_loader::EnvVars};
 
-pub type DBPool = Arc<Pool<PostgresConnectionManager<MakeRustlsConnect>>>;
+pub type DBPool = Arc<Pool<PostgresConnectionManager<MakeTlsConnector>>>;
 
 pub async fn create_db_pool(env_vars: EnvVars) -> Result<DBPool, Error> {
     
-    let current_dir: String = env::current_dir().unwrap().display().to_string();
-
     let postgre_name = env_vars.get("RDS_DB_NAME").unwrap();
     let postgre_username = env_vars.get("RDS_DB_USERNAME").unwrap();
     let postgre_password = env_vars.get("RDS_DB_PASSWORD").unwrap();
     let postgre_domain = env_vars.get("RDS_DB_SERVER_DOMAIN").unwrap();
 
-    let mut path = PathBuf::from(current_dir);
-    path.push("rds-ca.pem");
-    let path = path.display().to_string();
-    let mut reader = BufReader::new(path.as_bytes());
+    let connector = TlsConnector::builder().danger_accept_invalid_certs(true).build().unwrap();
+    let connector = MakeTlsConnector::new(connector);
 
-    let mut root_store = RootCertStore::empty();
-    root_store.extend(webpki_roots::TLS_SERVER_ROOTS.iter().cloned());
-    let certs = rustls_pemfile::certs(&mut reader);
-    for cert in certs {
-        root_store.add(cert.unwrap()).unwrap();
-    }
+    let conn_string = format!("host={} user={} password={} dbname={} port=5432 sslmode=require", postgre_domain, postgre_username, postgre_password, postgre_name);
 
-    let config = ClientConfig::builder()
-        .with_root_certificates(root_store)
-        .with_no_client_auth();
-
-    let rustls_connect = MakeRustlsConnect::new(config);
-
-    let cfg = format!("postgresql://{}:{}@{}:{}/{}?sslmode=require", postgre_username, postgre_password, postgre_domain, 5432, postgre_name);
-
-    let mgr = PostgresConnectionManager::new_from_stringlike(cfg, rustls_connect)?;
+    let mgr = PostgresConnectionManager::new_from_stringlike(conn_string, connector)?;
     
     let pool = Pool::builder().build(mgr).await?;
     
