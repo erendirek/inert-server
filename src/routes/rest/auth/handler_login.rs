@@ -75,8 +75,7 @@ async fn handle_auth_login_correct_payload(payload: &AuthLoginReqBody, dbp: &DBP
 
     let jwtpayload = JWTPayload {
         uuid: user_id.to_string(),
-        // exp: (Utc::now() + Duration::from_secs(60 * 15)).signed_duration_since(Utc)
-        exp: SystemTime::now().duration_since(UNIX_EPOCH).expect("time backwards").as_millis() + Duration::from_secs(60 * 15).as_millis()
+        exp: (Utc::now() + Duration::from_secs(60 * 15)).timestamp_millis().max(0).unsigned_abs()
     };
     
     let secret = env_vars.get("JWT_KEY").unwrap().as_bytes();

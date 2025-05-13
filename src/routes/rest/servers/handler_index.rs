@@ -1,9 +1,10 @@
 use std::str::FromStr;
 
-use axum::{response::IntoResponse, Extension, Json};
+use axum::{extract::rejection::JsonRejection, response::IntoResponse, Extension, Json};
 use chrono::{DateTime, Utc};
 use hyper::StatusCode;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 use crate::{database::DBPool, errors::AppError, utils::jwt::UserUUID};
 
@@ -32,9 +33,9 @@ pub async fn get_servers_index(Extension(user_uuid): Extension<UserUUID>, Extens
     let mut servers_vec = Vec::<ServerObject>::new();
 
     for server in servers {
-        let id: uuid::Uuid = server.try_get("id").map_err(|err| AppError::InternalServerError("internal server error".to_string()))?;
-        let name: String = server.try_get("name").map_err(|err| AppError::InternalServerError("internal server error".to_string()))?;
-        let created_at: DateTime<Utc> = server.try_get("created_at").map_err(|err| AppError::InternalServerError("internal server error".to_string()))?;
+        let id: uuid::Uuid = server.try_get("id").map_err(|_| AppError::InternalServerError("internal server error".to_string()))?;
+        let name: String = server.try_get("name").map_err(|_| AppError::InternalServerError("internal server error".to_string()))?;
+        let created_at: DateTime<Utc> = server.try_get("created_at").map_err(|_| AppError::InternalServerError("internal server error".to_string()))?;
 
         servers_vec.push(ServerObject { server_id: id.to_string(), server_name: name, server_create_at: created_at });
     }
@@ -43,22 +44,76 @@ pub async fn get_servers_index(Extension(user_uuid): Extension<UserUUID>, Extens
         servers: servers_vec
     };
     
-    Ok(ServersIndexResponse {
+    Ok(ServersIndexGetResponse {
         status_code: StatusCode::OK,
         body: servers_res
     })
 }
 
-pub async fn post_servers_index() -> impl IntoResponse {
-    "hello from servers post"
+pub async fn post_servers_index(Extension(user_uuid): Extension<UserUUID>, Extension(dbp): Extension<DBPool>,val: Result<Json<ServerCreateReqBody>, JsonRejection>) -> Result<impl IntoResponse, AppError> {
+
+    let req_body = match val {
+        Ok(Json(val)) => val,
+        Err(err) => {
+            println!("{}", err);
+            return Err(AppError::InvalidJsonType("invalid json type".to_string()));
+        },
+    };
+    
+    let name = req_body.name;
+    let uuid: uuid::Uuid = match uuid::Uuid::from_str(&user_uuid) {
+        Ok(val) => val,
+        Err(err) => {
+            println!("{}", err);
+            return Err(AppError::InternalServerError("internal server error".to_string()))
+        },
+    };
+
+    let conn = match dbp.get().await {
+        Ok(conn) => conn,
+        Err(err) => {
+            println!("{}", err);
+            return Err(AppError::DatabaseError("database error".to_string()));
+        },
+    }; 
+
+
+    let count = match conn.execute(
+    "
+            WITH sid AS (
+                INSERT INTO servers (name, owner_id) 
+                VALUES ($1, $2) 
+                RETURNING id
+            )
+            INSERT INTO server_members (server_id, user_id)
+            SELECT id, $3 FROM sid;
+    ", &[&name, &uuid, &uuid])
+    .await {
+        Ok(res) => res,
+        Err(err) => {
+            println!("{}", err);
+            return Err(AppError::DatabaseError("database error".to_string()));
+        },
+    };
+
+    let json_res = json!({
+        "msg": "server created"
+    });
+
+    Ok((StatusCode::OK, Json(json_res)).into_response())
 }
 
-struct ServersIndexResponse {
+#[derive(Deserialize)]
+pub struct ServerCreateReqBody {
+    name: String
+}
+
+struct ServersIndexGetResponse {
     status_code: StatusCode,
     body: ServersIndexResponseBody
 }
 
-impl IntoResponse for ServersIndexResponse {
+impl IntoResponse for ServersIndexGetResponse {
     fn into_response(self) -> axum::response::Response {
         (self.status_code, Json(self.body)).into_response()
     }

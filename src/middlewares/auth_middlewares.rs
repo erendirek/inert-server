@@ -24,7 +24,7 @@ pub async fn auth_required(env_vars: Extension<EnvVars>, mut req: Request, next:
         return Err(AppError::AuthUnauthorized("invalid token".to_string()));
     };
 
-    if Utc::now() > token_claims.exp {
+    if Utc::now().timestamp_millis().unsigned_abs() > token_claims.exp {
         return Err(AppError::AuthTokenExpired("token expired".to_string()));
     }
 
