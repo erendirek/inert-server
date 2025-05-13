@@ -22,3 +22,7 @@ tokio = { version = "1", features = ["full"] }
 tokio-postgres = {version = "0.7.13", features = ["with-uuid-1", "with-chrono-0_4"]}
 tower = "0.5.2"
 uuid = { version = "1", features = ["serde", "v4"] }
+tokio-postgres-rustls = "0.13.0"
+rustls = "0.23.27"
+webpki-roots = "1.0.0"
+rustls-pemfile = "2.2.0"
