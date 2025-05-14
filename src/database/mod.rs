@@ -1,15 +1,14 @@
 pub mod db_test;
 
-use std::{env, fs::{self, File}, io::BufReader, path::{Path, PathBuf}, sync::Arc};
+use std::sync::Arc;
 
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use native_tls::TlsConnector;
-use postgres::{tls::{MakeTlsConnect, NoTlsStream, TlsConnect}, Error, Socket};
+use postgres::Error;
 use postgres_native_tls::MakeTlsConnector;
-use tokio_postgres::{self, Client, Connection, NoTls};
 
-use crate::{errors::AppError, utils::env_loader::EnvVars};
+use crate::utils::env_loader::EnvVars;
 
 pub type DBPool = Arc<Pool<PostgresConnectionManager<MakeTlsConnector>>>;
 

@@ -1,4 +1,3 @@
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use axum::{extract::Request, middleware::Next, response::Response, Extension};
 use chrono::Utc;

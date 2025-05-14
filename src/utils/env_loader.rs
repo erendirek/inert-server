@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, sync::{Arc, Mutex}};
+use std::{collections::HashMap, env, sync::Arc};
 
 use dotenv::dotenv;
 

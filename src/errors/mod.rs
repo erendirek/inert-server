@@ -1,8 +1,6 @@
-use std::io;
 
 use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
-use serde::Serialize;
 use serde_json::json;
 use thiserror::Error;
 
@@ -20,6 +18,10 @@ pub enum AppError {
     #[error("auth token expired; 1005")]
     AuthTokenExpired(String),
     
+    // 5000 class errors
+    #[error("server not found; 5001")]
+    ServerNotFound(String),
+
     // 6000 class errors
     #[error("internal server error; 6002")]
     InternalServerError(String),
@@ -28,7 +30,9 @@ pub enum AppError {
     #[error["database error; 7001"]]
     DatabaseError(String),
     #[error["invalid json type; 7002"]]
-    InvalidJsonType(String)
+    InvalidJsonType(String),
+    #[error["invalid path; 7003"]]
+    InvalidPath(String),
 }
 
 impl IntoResponse for AppError {
@@ -39,11 +43,14 @@ impl IntoResponse for AppError {
             AppError::AuthUserNotFound(msg) => (StatusCode::NOT_FOUND, 1002, msg),
             AppError::AuthUnauthorized(msg) => (StatusCode::UNAUTHORIZED, 1004, msg),
             AppError::AuthTokenExpired(msg) => (StatusCode::UNAUTHORIZED, 1005, msg),
+            // 5000 class errors
+            AppError::ServerNotFound(msg) => (StatusCode::NOT_FOUND, 5001, msg),
             // 6000 class errors
             AppError::InternalServerError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, 6001, msg),
             // 7000 class errors
             AppError::DatabaseError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, 7001, msg),
             AppError::InvalidJsonType(msg) => (StatusCode::BAD_REQUEST, 7002, msg),
+            AppError::InvalidPath(msg) => (StatusCode::BAD_REQUEST, 7003, msg),
         };
 
         let res = json!({

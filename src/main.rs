@@ -1,7 +1,4 @@
-use std::{env, fs};
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
 use axum::{Extension, Router};
 
 use inert::{database::create_db_pool, routes::rest::setup_rest_index_router};

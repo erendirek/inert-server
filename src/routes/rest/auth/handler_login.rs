@@ -1,7 +1,7 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::Duration;
 
 use axum::{extract::rejection::JsonRejection, response::IntoResponse, Extension, Json};
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use hyper::StatusCode;
 use jsonwebtoken::{EncodingKey, Header};
 use serde::{Deserialize, Serialize};
@@ -75,7 +75,7 @@ async fn handle_auth_login_correct_payload(payload: &AuthLoginReqBody, dbp: &DBP
 
     let jwtpayload = JWTPayload {
         uuid: user_id.to_string(),
-        exp: (Utc::now() + Duration::from_secs(60 * 15)).timestamp_millis().max(0).unsigned_abs()
+        exp: (Utc::now() + Duration::from_secs(60 * 60)).timestamp_millis().max(0).unsigned_abs()
     };
     
     let secret = env_vars.get("JWT_KEY").unwrap().as_bytes();

@@ -37,7 +37,7 @@ pub async fn get_servers_index(Extension(user_uuid): Extension<UserUUID>, Extens
         let name: String = server.try_get("name").map_err(|_| AppError::InternalServerError("internal server error".to_string()))?;
         let created_at: DateTime<Utc> = server.try_get("created_at").map_err(|_| AppError::InternalServerError("internal server error".to_string()))?;
 
-        servers_vec.push(ServerObject { server_id: id.to_string(), server_name: name, server_create_at: created_at });
+        servers_vec.push(ServerObject { server_id: id, server_name: name, server_create_at: created_at });
     }
 
     let servers_res = ServersIndexResponseBody {
@@ -126,7 +126,7 @@ struct ServersIndexResponseBody {
 
 #[derive(Serialize)]
 struct ServerObject {
-    server_id: String,
+    server_id: uuid::Uuid,
     server_name: String,
     server_create_at: DateTime<Utc>
 }

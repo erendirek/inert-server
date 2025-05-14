@@ -16,17 +16,17 @@ REST API, veri yönetimi ve geçmiş sorguları için kullanılır.
 
 ### Kimlik Dogrulama
 
-- `POST /auth/register` — Yeni kullanıcı kaydı oluşturur.
-- `POST /auth/login` — Kullanıcı giriş işlemini yapar.
-- `POST /auth/logout` — Kullanıcı cikis işlemini yapar.
-- `POST /auth/refresh` — Refresh token ile yeni access token alınır.
-- `GET /auth/me` — Geçerli JWT token ile kullanıcı bilgilerini getirir.
+- [x] `POST /auth/register` — Yeni kullanıcı kaydı oluşturur.
+- [x] `POST /auth/login` — Kullanıcı giriş işlemini yapar.
+- [ ] `POST /auth/logout` — Kullanıcı cikis işlemini yapar.
+- [ ] `POST /auth/refresh` — Refresh token ile yeni access token alınır.
+- [x] `GET /auth/me` — Geçerli JWT token ile kullanıcı bilgilerini getirir.
 
 ### Sunucular
 
-- `GET /servers` — Kullanıcının bulunduğu tüm sunucuları listeler
-- `POST /servers` — Yeni sunucu oluşturur
-- `GET /servers/{server_id}` — Sunucu detaylarını getirir
+- [x] `GET /servers` — Kullanıcının bulunduğu tüm sunucuları listeler
+- [x] `POST /servers` — Yeni sunucu oluşturur
+- [x] `GET /servers/{server_id}` — Sunucu detaylarını getirir
 - `PATCH /servers/{server_id}` — Sunucu ayarlarını günceller
 - `DELETE /servers/{server_id}` — Sunucuyu siler
 
