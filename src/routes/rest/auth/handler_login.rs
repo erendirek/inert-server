@@ -74,7 +74,7 @@ async fn handle_auth_login_correct_payload(payload: &AuthLoginReqBody, dbp: &DBP
     let hashed_pass = hex::encode(sh);
 
     let jwtpayload = JWTPayload {
-        uuid: user_id.to_string(),
+        uuid: user_id,
         exp: (Utc::now() + Duration::from_secs(60 * 60)).timestamp_millis().max(0).unsigned_abs()
     };
     

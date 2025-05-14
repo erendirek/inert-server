@@ -37,8 +37,8 @@ REST API, veri yönetimi ve geçmiş sorguları için kullanılır.
 
 ### Mesajlar
 
-- [ ] `GET /channels/{channel_id}/messages?limit=N&before=X` — Kanal geçmiş mesajlarını getirir (paging destekli)
-- [ ] `POST /channels/{channel_id}/messages` — Yeni mesaj gönderir
+- [x] `GET /channels/{channel_id}/messages?limit=N&before=X` — Kanal geçmiş mesajlarını getirir (paging destekli)
+- [x] `POST /channels/{channel_id}/messages` — Yeni mesaj gönderir
 - [ ] `DELETE /channels/{channel_id}/messages/{message_id}` — Mesaj siler
 
 ### Kullanıcılar

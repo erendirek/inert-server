@@ -17,7 +17,6 @@ pub async fn get_servers_index(Extension(user_uuid): Extension<UserUUID>, Extens
         }
     };
 
-    let user_uuid = uuid::Uuid::from_str(&user_uuid).unwrap();
     let servers = match conn.query("SELECT s.id as id, s.name as name, s.created_at as created_at 
                                         FROM server_members sm 
                                         JOIN servers s ON sm.server_id = s.id 
@@ -61,13 +60,6 @@ pub async fn post_servers_index(Extension(user_uuid): Extension<UserUUID>, Exten
     };
     
     let name = req_body.name;
-    let uuid: uuid::Uuid = match uuid::Uuid::from_str(&user_uuid) {
-        Ok(val) => val,
-        Err(err) => {
-            println!("{}", err);
-            return Err(AppError::InternalServerError("internal server error".to_string()))
-        },
-    };
 
     let conn = match dbp.get().await {
         Ok(conn) => conn,
@@ -87,7 +79,7 @@ pub async fn post_servers_index(Extension(user_uuid): Extension<UserUUID>, Exten
             )
             INSERT INTO server_members (server_id, user_id)
             SELECT id, $3 FROM sid;
-    ", &[&name, &uuid, &uuid])
+    ", &[&name, &user_uuid, &user_uuid])
     .await {
         Ok(res) => res,
         Err(err) => {

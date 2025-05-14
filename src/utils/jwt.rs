@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-pub type UserUUID = String;
+pub type UserUUID = uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JWTPayload {
-    pub uuid: String,
+    pub uuid: UserUUID,
     pub exp: u64
 }

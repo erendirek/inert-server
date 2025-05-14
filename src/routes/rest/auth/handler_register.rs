@@ -68,7 +68,7 @@ async fn handle_auth_register_correct_payload(auth_register_payload: &AuthRegist
     };
 
     let jwtpayload = JWTPayload {
-        uuid: user_id.to_string(),
+        uuid: user_id,
         exp: (Utc::now() + Duration::from_secs(60 * 15)).timestamp_millis().max(0).unsigned_abs()
     };
 
