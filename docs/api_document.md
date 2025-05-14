@@ -27,29 +27,29 @@ REST API, veri yönetimi ve geçmiş sorguları için kullanılır.
 - [x] `GET /servers` — Kullanıcının bulunduğu tüm sunucuları listeler
 - [x] `POST /servers` — Yeni sunucu oluşturur
 - [x] `GET /servers/{server_id}` — Sunucu detaylarını getirir
-- `PATCH /servers/{server_id}` — Sunucu ayarlarını günceller
-- `DELETE /servers/{server_id}` — Sunucuyu siler
+- [ ] `PATCH /servers/{server_id}` — Sunucu ayarlarını günceller
+- [ ] `DELETE /servers/{server_id}` — Sunucuyu siler
 
 ### Kanallar
 
-- `GET /servers/{server_id}/channels` — Sunucudaki tüm kanalları listeler
-- `POST /servers/{server_id}/channels` — Yeni kanal oluşturur
+- [ ] `GET /servers/{server_id}/channels` — Sunucudaki tüm kanalları listeler
+- [ ] `POST /servers/{server_id}/channels` — Yeni kanal oluşturur
 
 ### Mesajlar
 
-- `GET /channels/{channel_id}/messages?limit=N&before=X` — Kanal geçmiş mesajlarını getirir (paging destekli)
-- `POST /channels/{channel_id}/messages` — Yeni mesaj gönderir
-- `DELETE /channels/{channel_id}/messages/{message_id}` — Mesaj siler
+- [ ] `GET /channels/{channel_id}/messages?limit=N&before=X` — Kanal geçmiş mesajlarını getirir (paging destekli)
+- [ ] `POST /channels/{channel_id}/messages` — Yeni mesaj gönderir
+- [ ] `DELETE /channels/{channel_id}/messages/{message_id}` — Mesaj siler
 
 ### Kullanıcılar
 
-- `GET /users/{user_id}` — Kullanıcı profili bilgisi
-- `PATCH /users/{user_id}` — Profil güncelleme
+- [ ] `GET /users/{user_id}` — Kullanıcı profili bilgisi
+- [ ] `PATCH /users/{user_id}` — Profil güncelleme
 
 ### DM Kanalları
 
-- `GET /users/{user_id}/dm-channels` — Kullanıcının DM kanallarını listeler
-- `POST /users/{user_id}/dm-channels` — Yeni DM kanalı başlatır
+- [ ] `GET /users/{user_id}/dm-channels` — Kullanıcının DM kanallarını listeler
+- [ ] `POST /users/{user_id}/dm-channels` — Yeni DM kanalı başlatır
 
 ---
 
