@@ -5,8 +5,8 @@ Bu belge, Discord tarzı bir sohbet uygulaması için hem REST API hem de WebSoc
 ## Genel
 
 - **API Versiyonu:** v1
-- **REST Base URL:** `https://yourhost.com/api/rest`
-- **WebSocket URL:** `wss://yourhost.com/api/ws`
+- **REST Base URL:** `https://domain/api/rest`
+- **WebSocket URL:** `wss://domain/api/ws`
 
 ---
 
@@ -43,7 +43,7 @@ REST API, veri yönetimi ve geçmiş sorguları için kullanılır.
 
 ### Kullanıcılar
 
-- [ ] `GET /users/{user_id}` — Kullanıcı profili bilgisi
+- [x] `GET /users/{user_id}` — Kullanıcı profili bilgisi
 - [ ] `PATCH /users/{user_id}` — Profil güncelleme
 
 ### DM Kanalları

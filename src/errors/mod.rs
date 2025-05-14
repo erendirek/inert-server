@@ -18,6 +18,10 @@ pub enum AppError {
     #[error("auth token expired; 1005")]
     AuthTokenExpired(String),
     
+    // 2000 class errors
+    #[error("user not found; 2001")]
+    UserNotFound(String),
+
     // 3000 class errors
     #[error("channel not found; 3001")]
     ChannelNotFound(String),
@@ -47,6 +51,8 @@ impl IntoResponse for AppError {
             AppError::AuthUserNotFound(msg) => (StatusCode::NOT_FOUND, 1002, msg),
             AppError::AuthUnauthorized(msg) => (StatusCode::UNAUTHORIZED, 1004, msg),
             AppError::AuthTokenExpired(msg) => (StatusCode::UNAUTHORIZED, 1005, msg),
+            // 2000 class errors
+            AppError::UserNotFound(msg) => (StatusCode::NOT_FOUND, 2001, msg),
             // 3000 class errors
             AppError::ChannelNotFound(msg) => (StatusCode::NOT_FOUND, 3001, msg),
             // 5000 class errors
