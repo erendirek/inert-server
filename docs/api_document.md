@@ -32,8 +32,8 @@ REST API, veri yönetimi ve geçmiş sorguları için kullanılır.
 
 ### Kanallar
 
-- [ ] `GET /servers/{server_id}/channels` — Sunucudaki tüm kanalları listeler
-- [ ] `POST /servers/{server_id}/channels` — Yeni kanal oluşturur
+- [x] `GET /servers/{server_id}/channels` — Sunucudaki tüm kanalları listeler
+- [x] `POST /servers/{server_id}/channels` — Yeni kanal oluşturur
 
 ### Mesajlar
 

@@ -1,5 +1,3 @@
-pub mod db_test;
-
 use std::sync::Arc;
 
 use bb8::Pool;
