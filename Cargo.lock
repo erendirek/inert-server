@@ -612,7 +612,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "inert"
+name = "inert_server"
 version = "0.1.0"
 dependencies = [
  "axum",

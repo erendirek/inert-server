@@ -1,8 +1,8 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use axum::{Extension, Router};
 
-use inert::{database::create_db_pool, routes::rest::setup_rest_index_router};
-use inert::utils::env_loader::{load_env_variables, EnvVars};
+use inert_server::{database::create_db_pool, routes::rest::setup_rest_index_router};
+use inert_server::utils::env_loader::{load_env_variables, EnvVars};
 
 #[tokio::main]
 async fn main() -> Result<(), &'static str>{
