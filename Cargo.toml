@@ -23,4 +23,5 @@ thiserror = "2.0.12"
 tokio = { version = "1", features = ["full"] }
 tokio-postgres = {version = "0.7.13", features = ["with-uuid-1", "with-chrono-0_4"]}
 tower = "0.5.2"
+tower-http = { version = "0.6.4", features = ["cors"]}
 uuid = { version = "1", features = ["serde", "v4"] }
