@@ -1,13 +1,16 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use axum::{Extension, Router};
 
-use hyper::Method;
+use hyper::{header, Method};
 use inert_server::{database::create_db_pool, routes::rest::setup_rest_index_router};
 use inert_server::utils::env_loader::{load_env_variables, EnvVars};
 use tower_http::cors::{Any, CorsLayer};
 
 fn setup_cors_layer() -> CorsLayer {
-    CorsLayer::new().allow_origin(Any).allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PATCH, Method::OPTIONS])
+    CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PATCH, Method::OPTIONS])
+        .allow_headers([header::AUTHORIZATION])
 }
 
 #[tokio::main]
