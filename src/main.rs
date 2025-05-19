@@ -10,7 +10,7 @@ fn setup_cors_layer() -> CorsLayer {
     CorsLayer::new()
         .allow_origin(Any)
         .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PATCH, Method::OPTIONS])
-        .allow_headers([header::AUTHORIZATION])
+        .allow_headers([header::AUTHORIZATION, header::ACCESS_CONTROL_ALLOW_HEADERS])
 }
 
 #[tokio::main]
