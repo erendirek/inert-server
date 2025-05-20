@@ -57,7 +57,13 @@ pub async fn get_channels_dynamic_channelid_messages(Extension(user_uuid): Exten
 
     let limit: i64 = 20;
     let offset = limit * page as i64;
-    let messages = match conn.query("SELECT * FROM messages WHERE channel_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3", &[&channel_id, &limit, &offset]).await {
+    let messages = match conn.query("SELECT m.id AS id, channel_id, author_id, content, m.created_at AS created_at, m.edited_at AS edited_at, deleted, username, email 
+	    FROM messages m
+	    INNER JOIN users u ON u.id = m.author_id 
+	    WHERE channel_id = $1
+	    ORDER BY m.created_at DESC
+        LIMIT $2 OFFSET $3", 
+    &[&channel_id, &limit, &offset]).await {
         Ok(val) => val,
         Err(err) => {
             println!("{}", err);
@@ -73,7 +79,11 @@ pub async fn get_channels_dynamic_channelid_messages(Extension(user_uuid): Exten
         let content: String = message.try_get("content").map_err(|_| AppError::InternalServerError("internal server error4".to_string()))?;
         let created_at: DateTime<Utc> = message.try_get("created_at").map_err(|_| AppError::InternalServerError("internal server error5".to_string()))?;
         let edited_at: Option<DateTime<Utc>> = message.try_get("edited_at").map_err(|_| AppError::InternalServerError("internal server error6".to_string()))?;
-        messages_vec.push(MessageObject { id, channel_id, author_id, content, created_at, edited_at });
+        let deleted: bool = message.try_get("deleted").map_err(|_| AppError::InternalServerError("internal server error6".to_string()))?;
+        let username: String = message.try_get("username").map_err(|_| AppError::InternalServerError("internal server error6".to_string()))?;
+        let email: String = message.try_get("email").map_err(|_| AppError::InternalServerError("internal server error6".to_string()))?;
+
+        messages_vec.push(MessageObject { id, channel_id, author_id, content, created_at, edited_at, deleted, username, email });
     }
 
     let res_json = json!({
@@ -154,5 +164,8 @@ struct MessageObject {
     author_id: uuid::Uuid,
     content: String,
     created_at: DateTime<Utc>,
-    edited_at: Option<DateTime<Utc>>
+    edited_at: Option<DateTime<Utc>>,
+    deleted: bool,
+    username: String,
+    email: String,
 }
