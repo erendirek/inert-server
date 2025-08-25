@@ -1,77 +1,77 @@
-# Sohbet Uygulaması Veritabanı Tasarımı
+# Chat Application Database Design
 
-Bu belge, Discord benzeri bir sohbet uygulaması için geleceğe yönelik, genişletilebilir ve modüler bir veritabanı tasarımı sunar. Aşağıda kullanıcılar, sunucular, kanallar, mesajlar, roller, kimlik doğrulama ve DM gibi temel yapılar detaylandırılmıştır.
+This document presents a future-proof, extensible, and modular database design for a Discord-like chat application. The basic structures such as users, servers, channels, messages, roles, authentication, and DMs are detailed below.
 
 ---
 
-## Tablolar
+## Tables
 
 ### 1. `users`
 
-Kullanıcı hesap bilgilerini tutar.
+Stores user account information.
 
-| Alan          | Tip       | Açıklama                |
+| Field         | Type      | Description             |
 | ------------- | --------- | ----------------------- |
-| id            | UUID (PK) | Kullanıcı ID            |
-| username      | TEXT      | Benzersiz kullanıcı adı |
-| email         | TEXT      | E-posta                 |
-| password_hash | TEXT      | Şifre hash'i            |
-| created_at    | TIMESTAMP | Kayıt tarihi            |
-| updated_at    | TIMESTAMP | Son güncelleme          |
+| id            | UUID (PK) | User ID                 |
+| username      | TEXT      | Unique username         |
+| email         | TEXT      | Email                   |
+| password_hash | TEXT      | Password hash           |
+| created_at    | TIMESTAMP | Registration date       |
+| updated_at    | TIMESTAMP | Last update             |
 
 ---
 
 ### 2. `servers`
 
-Kullanıcıların oluşturduğu sunucuları tutar.
+Stores servers created by users.
 
-| Alan       | Tip       | Açıklama           |
+| Field      | Type      | Description        |
 | ---------- | --------- | ------------------ |
-| id         | UUID (PK) | Sunucu ID          |
-| name       | TEXT      | Sunucu adı         |
-| owner_id   | UUID (FK) | Sunucu sahibi      |
-| created_at | TIMESTAMP | Oluşturulma tarihi |
+| id         | UUID (PK) | Server ID          |
+| name       | TEXT      | Server name        |
+| owner_id   | UUID (FK) | Server owner       |
+| created_at | TIMESTAMP | Creation date      |
 
 ---
 
 ### 3. `server_members`
 
-Sunuculara katılmış kullanıcıları tutar.
+Stores users who have joined servers.
 
-| Alan      | Tip       | Açıklama            |
+| Field     | Type      | Description         |
 | --------- | --------- | ------------------- |
-| server_id | UUID (FK) | Sunucu ID           |
-| user_id   | UUID (FK) | Kullanıcı ID        |
-| joined_at | TIMESTAMP | Katılma tarihi      |
-| nickname  | TEXT      | Sunucu içi takma ad |
+| server_id | UUID (FK) | Server ID           |
+| user_id   | UUID (FK) | User ID             |
+| joined_at | TIMESTAMP | Join date           |
+| nickname  | TEXT      | In-server nickname  |
 
-**PK:** `(server_id, user_id)` (bileşik anahtar)
+**PK:** `(server_id, user_id)` (composite key)
 
 ---
 
 ### 4. `roles`
 
-Sunucu içi roller.
+In-server roles.
 
-| Alan        | Tip       | Açıklama           |
-| ----------- | --------- | ------------------ |
-| id          | UUID (PK) | Rol ID             |
-| server_id   | UUID (FK) | Hangi sunucuya ait |
-| name        | TEXT      | Rol adı            |
-| permissions | JSON      | Yetkiler           |
-| is_default  | BOOLEAN   | Varsayılan rol mü? |
+| Field       | Type      | Description              |
+| ----------- | --------- | ------------------------ |
+| id          | UUID (PK) | Role ID                  |
+| server_id   | UUID (FK) | Which server it belongs to |
+| name        | TEXT      | Role name                |
+| permissions | JSON      | Permissions              |
+| is_default  | BOOLEAN   | Is it the default role?  |
 
 ---
 
 ### 5. `server_member_roles`
 
-Hangi kullanıcının hangi rolde olduğunu belirtir.
+Specifies which user has which role.
 
-| Alan      | Tip       | Açıklama     |
+| Field     | Type      | Description  |
 | --------- | --------- | ------------ |
-| server_id | UUID (FK) | Sunucu ID    |
-| user_id   | UUID (FK) | Kullanıcı ID |
-| role_id   | UUID (FK) | Rol ID       |
+| server_id | UUID (FK) | Server ID    |
+| user_id   | UUID (FK) | User ID      |
+| role_id   | UUID (FK) | Role ID      |
 
 **PK:** `(server_id, user_id, role_id)`
 
@@ -79,71 +79,71 @@ Hangi kullanıcının hangi rolde olduğunu belirtir.
 
 ### 6. `channels`
 
-Sunucular içerisindeki metin kanalları.
+Text channels within servers.
 
-| Alan       | Tip       | Açıklama           |
+| Field      | Type      | Description        |
 | ---------- | --------- | ------------------ |
-| id         | UUID (PK) | Kanal ID           |
-| server_id  | UUID (FK) | Sunucu ID          |
-| name       | TEXT      | Kanal adı          |
-| created_at | TIMESTAMP | Oluşturulma tarihi |
+| id         | UUID (PK) | Channel ID         |
+| server_id  | UUID (FK) | Server ID          |
+| name       | TEXT      | Channel name       |
+| created_at | TIMESTAMP | Creation date      |
 
 ---
 
 ### 7. `messages`
 
-Metin mesajları (kanal ve DM).
+Text messages (channel and DM).
 
-| Alan          | Tip       | Açıklama               |
+| Field         | Type      | Description              |
 | ------------- | --------- | ---------------------- |
-| id            | UUID (PK) | Mesaj ID               |
-| channel_id    | UUID (FK) | Kanal ID (nullable)    |
-| dm_channel_id | UUID (FK) | DM Kanal ID (nullable) |
-| author_id     | UUID (FK) | Gönderen               |
-| content       | TEXT      | Mesaj içeriği          |
-| created_at    | TIMESTAMP | Gönderim tarihi        |
-| edited_at     | TIMESTAMP | Son düzenlenme         |
-| deleted       | BOOLEAN   | Silinmiş mi?           |
+| id            | UUID (PK) | Message ID               |
+| channel_id    | UUID (FK) | Channel ID (nullable)    |
+| dm_channel_id | UUID (FK) | DM Channel ID (nullable) |
+| author_id     | UUID (FK) | Sender                 |
+| content       | TEXT      | Message content          |
+| created_at    | TIMESTAMP | Sent date              |
+| edited_at     | TIMESTAMP | Last edited            |
+| deleted       | BOOLEAN   | Is it deleted?           |
 
-> `channel_id` ve `dm_channel_id` alanlarından sadece biri dolu olmalıdır.
+> Only one of the `channel_id` and `dm_channel_id` fields should be filled.
 
 ---
 
 ### 8. `dm_channels`
 
-Kullanıcılar arası bire bir mesajlaşma kanalı.
+One-to-one messaging channel between users.
 
-| Alan       | Tip       | Açıklama           |
+| Field      | Type      | Description        |
 | ---------- | --------- | ------------------ |
-| id         | UUID (PK) | DM Kanal ID        |
-| user1_id   | UUID (FK) | Kullanıcı 1        |
-| user2_id   | UUID (FK) | Kullanıcı 2        |
-| created_at | TIMESTAMP | Oluşturulma tarihi |
+| id         | UUID (PK) | DM Channel ID      |
+| user1_id   | UUID (FK) | User 1             |
+| user2_id   | UUID (FK) | User 2             |
+| created_at | TIMESTAMP | Creation date      |
 
-> `user1_id < user2_id` olacak şekilde sıralı tutulmalı (eşsizliği sağlamak için).
+> Should be kept sorted such that `user1_id < user2_id` (to ensure uniqueness).
 
 ---
 
 ### 9. `refresh_tokens`
 
-Kullanıcının aktif refresh token'larını saklar (isteğe bağlı).
+Stores the user's active refresh tokens (optional).
 
-| Alan       | Tip       | Açıklama           |
-| ---------- | --------- | ------------------ |
-| id         | UUID (PK) | Token ID           |
-| user_id    | UUID (FK) | Kullanıcı          |
-| token      | TEXT      | Refresh token      |
-| expires_at | TIMESTAMP | Geçerlilik bitişi  |
-| created_at | TIMESTAMP | Oluşturulma tarihi |
+| Field      | Type      | Description         |
+| ---------- | --------- | ------------------- |
+| id         | UUID (PK) | Token ID            |
+| user_id    | UUID (FK) | User                |
+| token      | TEXT      | Refresh token       |
+| expires_at | TIMESTAMP | Expiration date     |
+| created_at | TIMESTAMP | Creation date       |
 
 ---
 
-## İleride Eklenebilecek Yapılar
+## Structures That Can Be Added in the Future
 
-- `voice_channels`: Sesli sohbet kanalları
-- `attachments`: Mesajlara medya dosyası ekleme
-- `presence_status`: Kullanıcı online/dnd/idle durumu
-- `server_invites`: Davet sistemi
-- `audit_logs`: Moderasyon ve olay geçmişi
+- `voice_channels`: Voice chat channels
+- `attachments`: Adding media files to messages
+- `presence_status`: User online/dnd/idle status
+- `server_invites`: Invitation system
+- `audit_logs`: Moderation and event history
 
 ---

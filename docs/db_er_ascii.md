@@ -11,7 +11,7 @@
 
          ^                                         ^
          |                                         |
-         |                                         |
+         |                                         | 
          |                                         |
          |                                         |
          |   +--------------------+      +--------------------+
@@ -56,7 +56,7 @@
 |----------------|
 | id (PK)        |
 | channel_id (*) |
-| dm_channel_id(*)|
+| dm_channel_id(*)| 
 | author_id (FK) |
 | content        |
 | created_at     |
@@ -64,4 +64,4 @@
 | deleted        |
 +----------------+
 
-(*) channel_id veya dm_channel_id yalnızca biri dolu olur.
+(*) only one of channel_id or dm_channel_id is filled.

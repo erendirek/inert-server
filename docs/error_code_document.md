@@ -1,55 +1,55 @@
-# Hata Kodları ve Açıklamaları
+# Error Codes and Descriptions
 
-## 🔐 Auth & Kimlik Doğrulama (1000–1099)
+## 🔐 Auth & Authentication (1000–1099)
 
-| Kod  | Anahtar                  | Açıklama                             |
+| Code  | Key                  | Description                             |
 |------|--------------------------|--------------------------------------|
-| 1001 | AUTH_INVALID_CREDENTIALS | Email veya şifre hatalı              |
-| 1002 | AUTH_USER_NOT_FOUND      | Kullanıcı bulunamadı                 |
-| 1003 | AUTH_USER_ALREADY_EXISTS | Zaten kayıtlı kullanıcı              |
-| 1004 | AUTH_UNAUTHORIZED        | Giriş yapılmadan erişim denemesi     |
-| 1005 | AUTH_TOKEN_EXPIRED       | Tokenin suresi doldu                 |
+| 1001 | AUTH_INVALID_CREDENTIALS | Invalid email or password              |
+| 1002 | AUTH_USER_NOT_FOUND      | User not found                 |
+| 1003 | AUTH_USER_ALREADY_EXISTS | User already registered              |
+| 1004 | AUTH_UNAUTHORIZED        | Access attempt without login     |
+| 1005 | AUTH_TOKEN_EXPIRED       | Token has expired                 |
 
-## 👤 Kullanıcı İşlemleri (2000–2099)
+## 👤 User Operations (2000–2099)
 
-| Kod  | Anahtar              | Açıklama                   |
+| Code  | Key              | Description                   |
 |------|----------------------|----------------------------|
-| 2001 | USER_NOT_FOUND       | Belirtilen kullanıcı yok   |
-| 2002 | USER_ALREADY_FRIEND  | Zaten arkadaşsınız         |
-| 2003 | USER_BLOCKED         | Kullanıcı engellenmiş      |
+| 2001 | USER_NOT_FOUND       | Specified user does not exist   |
+| 2002 | USER_ALREADY_FRIEND  | You are already friends         |
+| 2003 | USER_BLOCKED         | User blocked      |
 
-## 🧵 Kanal İşlemleri (3000–3099)
+## 🧵 Channel Operations (3000–3099)
 
-| Kod  | Anahtar               | Açıklama                   |
+| Code  | Key               | Description                   |
 |------|-----------------------|----------------------------|
-| 3001 | CHANNEL_NOT_FOUND     | Kanal bulunamadı           |
-| 3002 | CHANNEL_ACCESS_DENIED | Kanal erişimi yok          |
-| 3003 | CHANNEL_ALREADY_EXISTS| Aynı adda kanal var        |
+| 3001 | CHANNEL_NOT_FOUND     | Channel not found           |
+| 3002 | CHANNEL_ACCESS_DENIED | Channel access denied          |
+| 3003 | CHANNEL_ALREADY_EXISTS| Channel with the same name already exists        |
 
-## 💬 Mesajlaşma (4000–4099)
+## 💬 Messaging (4000–4099)
 
-| Kod  | Anahtar              | Açıklama                        |
+| Code  | Key              | Description                        |
 |------|----------------------|---------------------------------|
-| 4001 | MESSAGE_NOT_FOUND    | Mesaj yok                       |
-| 4002 | MESSAGE_SEND_FAILED  | Gönderme başarısız              |
-| 4003 | MESSAGE_TOO_LONG     | Mesaj karakter sınırını aştı    |
+| 4001 | MESSAGE_NOT_FOUND    | Message not found                       |
+| 4002 | MESSAGE_SEND_FAILED  | Sending failed              |
+| 4003 | MESSAGE_TOO_LONG     | Message exceeded character limit    |
 
-## 🧑‍🤝‍🧑 Sunucular (Guilds) (5000–5099)
+## 🧑‍🤝‍🧑 Servers (Guilds) (5000–5099)
 
-| Kod  | Anahtar               | Açıklama                    |
+| Code  | Key               | Description                    |
 |------|-----------------------|-----------------------------|
-| 5001 | SERVER_NOT_FOUND      | Sunucu bulunamadı           |
-| 5002 | SERVER_ACCESS_DENIED  | Sunucuya erişim yok         |
+| 5001 | SERVER_NOT_FOUND      | Server not found           |
+| 5002 | SERVER_ACCESS_DENIED  | Server access denied         |
 
-## 🧱 Genel / Sistem Hataları (7000–7999)
+## 🧱 General / System Errors (7000–7999)
 
-| Kod  | Anahtar               | Açıklama                           |
+| Code  | Key               | Description                           |
 |------|-----------------------|------------------------------------|
-| 6001 | VALIDATION_FAILED     | Geçersiz veri girdisi              |
-| 6002 | INTERNAL_SERVER_ERROR | Beklenmeyen sunucu hatası          |
-| 6003 | RATE_LIMITED          | Çok fazla istek gönderildi         |
+| 6001 | VALIDATION_FAILED     | Invalid data entry              |
+| 6002 | INTERNAL_SERVER_ERROR | Unexpected server error          |
+| 6003 | RATE_LIMITED          | Too many requests sent         |
 
-## Ek hatalar
+## Additional errors
 - 7001 DATABASE_ERROR
 - 7002 INVALID_JSON_TYPE
 - 7003 INVALID_PATH

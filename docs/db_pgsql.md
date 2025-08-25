@@ -1,4 +1,4 @@
-# Kullanıcılar
+# Users
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username TEXT NOT NULL UNIQUE,
@@ -8,7 +8,7 @@ CREATE TABLE users (
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
-# Sunucular
+# Servers
 CREATE TABLE servers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE servers (
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
-# Sunucu Üyeleri
+# Server Members
 CREATE TABLE server_members (
     server_id UUID NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -25,7 +25,7 @@ CREATE TABLE server_members (
     PRIMARY KEY (server_id, user_id)
 );
 
-# Roller
+# Roles
 CREATE TABLE roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     server_id UUID NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
@@ -34,7 +34,7 @@ CREATE TABLE roles (
     is_default BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-# Üyelerin Rollerle İlişkisi
+# Relationship of Members with Roles
 CREATE TABLE server_member_roles (
     server_id UUID NOT NULL,
     user_id UUID NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE server_member_roles (
     FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
-# Kanal Tablosu
+# Channel Table
 CREATE TABLE channels (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     server_id UUID NOT NULL REFERENCES servers(id) ON DELETE CASCADE,
@@ -52,7 +52,7 @@ CREATE TABLE channels (
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
-# DM Kanalı
+# DM Channel
 CREATE TABLE dm_channels (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -62,7 +62,7 @@ CREATE TABLE dm_channels (
     CONSTRAINT user_order CHECK (user1_id < user2_id)
 );
 
-# Mesajlar
+# Messages
 CREATE TABLE messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     channel_id UUID REFERENCES channels(id) ON DELETE CASCADE,
@@ -78,7 +78,7 @@ CREATE TABLE messages (
     )
 );
 
-# Refresh Tokenlar
+# Refresh Tokens
 CREATE TABLE refresh_tokens (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

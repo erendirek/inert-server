@@ -1,10 +1,10 @@
-# Sohbet ve Chat Uygulaması API Dokümantasyonu (v1)
+# Chat and Chat Application API Documentation (v1)
 
-Bu belge, Discord tarzı bir sohbet uygulaması için hem REST API hem de WebSocket protokol tanımlarını içerir. Bu yapı, gerçek zamanlı mesajlaşma ve sunucu-temelli sohbet altyapısı kurmak için kullanılacaktır.
+This document contains both REST API and WebSocket protocol definitions for a Discord-style chat application. This structure will be used to build a real-time messaging and server-based chat infrastructure.
 
-## Genel
+## General
 
-- **API Versiyonu:** v1
+- **API Version:** v1
 - **REST Base URL:** `https://domain/api/rest`
 - **WebSocket URL:** `wss://domain/api/ws`
 
@@ -12,78 +12,78 @@ Bu belge, Discord tarzı bir sohbet uygulaması için hem REST API hem de WebSoc
 
 ## REST API
 
-REST API, veri yönetimi ve geçmiş sorguları için kullanılır.
+The REST API is used for data management and history queries.
 
-### Kimlik Dogrulama
+### Authentication
 
-- [x] `POST /auth/register` — Yeni kullanıcı kaydı oluşturur.
-- [x] `POST /auth/login` — Kullanıcı giriş işlemini yapar.
-- [ ] `POST /auth/logout` — Kullanıcı cikis işlemini yapar.
-- [ ] `POST /auth/refresh` — Refresh token ile yeni access token alınır.
-- [x] `GET /auth/me` — Geçerli JWT token ile kullanıcı bilgilerini getirir.
+- [x] `POST /auth/register` — Creates a new user registration.
+- [x] `POST /auth/login` — Performs the user login process.
+- [ ] `POST /auth/logout` — Performs the user logout process.
+- [ ] `POST /auth/refresh` — Gets a new access token with a refresh token.
+- [x] `GET /auth/me` — Retrieves user information with a valid JWT token.
 
-### Sunucular
+### Servers
 
-- [x] `GET /servers` — Kullanıcının bulunduğu tüm sunucuları listeler
-- [x] `POST /servers` — Yeni sunucu oluşturur
-- [x] `GET /servers/{server_id}` — Sunucu detaylarını getirir
-- [ ] `PATCH /servers/{server_id}` — Sunucu ayarlarını günceller
-- [ ] `DELETE /servers/{server_id}` — Sunucuyu siler
+- [x] `GET /servers` — Lists all servers the user is in.
+- [x] `POST /servers` — Creates a new server.
+- [x] `GET /servers/{server_id}` — Retrieves server details.
+- [ ] `PATCH /servers/{server_id}` — Updates server settings.
+- [ ] `DELETE /servers/{server_id}` — Deletes the server.
 
-### Kanallar
+### Channels
 
-- [x] `GET /servers/{server_id}/channels` — Sunucudaki tüm kanalları listeler
-- [x] `POST /servers/{server_id}/channels` — Yeni kanal oluşturur
+- [x] `GET /servers/{server_id}/channels` — Lists all channels on the server.
+- [x] `POST /servers/{server_id}/channels` — Creates a new channel.
 
-### Mesajlar
+### Messages
 
-- [x] `GET /channels/{channel_id}/messages?limit=N&before=X` — Kanal geçmiş mesajlarını getirir (paging destekli)
-- [x] `POST /channels/{channel_id}/messages` — Yeni mesaj gönderir
-- [ ] `DELETE /channels/{channel_id}/messages/{message_id}` — Mesaj siler
+- [x] `GET /channels/{channel_id}/messages?limit=N&before=X` — Retrieves channel history messages (with paging support).
+- [x] `POST /channels/{channel_id}/messages` — Sends a new message.
+- [ ] `DELETE /channels/{channel_id}/messages/{message_id}` — Deletes a message.
 
-### Kullanıcılar
+### Users
 
-- [x] `GET /users/{user_id}` — Kullanıcı profili bilgisi
-- [ ] `PATCH /users/{user_id}` — Profil güncelleme
+- [x] `GET /users/{user_id}` — User profile information.
+- [ ] `PATCH /users/{user_id}` — Profile update.
 
-### DM Kanalları
+### DM Channels
 
-- [ ] `GET /users/{user_id}/dm-channels` — Kullanıcının DM kanallarını listeler
-- [ ] `POST /users/{user_id}/dm-channels` — Yeni DM kanalı başlatır
+- [ ] `GET /users/{user_id}/dm-channels` — Lists the user's DM channels.
+- [ ] `POST /users/{user_id}/dm-channels` — Starts a new DM channel.
 
 ---
 
-## WebSocket Protokolü
+## WebSocket Protocol
 
-WebSocket, gerçek zamanlı olayların aktarımı için kullanılır.
+WebSocket is used for the transmission of real-time events.
 
-### Bağlantı ve Heartbeat
+### Connection and Heartbeat
 
-| OpCode | Olay          | Açıklama                            |
+| OpCode | Event         | Description                         |
 | ------ | ------------- | ----------------------------------- |
-| 0      | HELLO         | Sunucu heartbeat aralığını bildirir |
-| 1      | HEARTBEAT     | İstemci heartbeat gönderir          |
-| 2      | HEARTBEAT_ACK | Sunucu heartbeat'i onaylar          |
+| 0      | HELLO         | Server reports the heartbeat interval |
+| 1      | HEARTBEAT     | Client sends a heartbeat          |
+| 2      | HEARTBEAT_ACK | Server acknowledges the heartbeat   |
 
-### Olaylar (Dispatch)
+### Events (Dispatch)
 
-| OpCode | Event                | Açıklama                                     |
+| OpCode | Event                | Description                                  |
 | ------ | -------------------- | -------------------------------------------- |
-| 10     | CONNECTED            | Bağlantı başarılı, kullanıcı bilgisi döner   |
-| 11     | MESSAGE_CREATE       | Yeni mesaj yayınlandı                        |
-| 12     | MESSAGE_UPDATE       | Mesaj güncellendi                            |
-| 13     | MESSAGE_DELETE       | Mesaj silindi                                |
-| 20     | CHANNEL_CREATE       | Yeni kanal oluşturuldu                       |
-| 21     | CHANNEL_UPDATE       | Kanal bilgisi güncellendi                    |
-| 22     | CHANNEL_DELETE       | Kanal silindi                                |
-| 30     | SERVER_MEMBER_ADD    | Sunucuya kullanıcı eklendi                   |
-| 31     | SERVER_MEMBER_REMOVE | Sunucudan kullanıcı çıkarıldı                |
-| 40     | PRESENCE_UPDATE      | Kullanıcı durumu değişti (online, idle, dnd) |
-| 50     | TYPING_START         | Kullanıcı yazmaya başladı                    |
+| 10     | CONNECTED            | Connection successful, returns user information |
+| 11     | MESSAGE_CREATE       | New message published                        |
+| 12     | MESSAGE_UPDATE       | Message updated                            |
+| 13     | MESSAGE_DELETE       | Message deleted                                |
+| 20     | CHANNEL_CREATE       | New channel created                       |
+| 21     | CHANNEL_UPDATE       | Channel information updated                    |
+| 22     | CHANNEL_DELETE       | Channel deleted                                |
+| 30     | SERVER_MEMBER_ADD    | User added to the server                   |
+| 31     | SERVER_MEMBER_REMOVE | User removed from the server                |
+| 40     | PRESENCE_UPDATE      | User status changed (online, idle, dnd) |
+| 50     | TYPING_START         | User started typing                    |
 
 ---
 
-### Örnek WebSocket Mesajları
+### Sample WebSocket Messages
 
 **MESSAGE_CREATE**
 
@@ -97,7 +97,7 @@ WebSocket, gerçek zamanlı olayların aktarımı için kullanılır.
       "user_id": "u789",
       "username": "eren"
     },
-    "content": "Merhaba!",
+    "content": "Hello!",
     "timestamp": "2025-05-11T12:34:56Z"
   }
 }
