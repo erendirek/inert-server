@@ -11,7 +11,6 @@ The following features are partially or fully completed in the current version o
 - **User Authentication:** Sign-up and login functionality.
 - **Server List:** Listing the servers a user has joined.
 - **Channel Management:** Displaying text channels within a server.
-- **Messaging Interface:** Basic UI for sending and viewing messages (not real-time).
 
 ## 🗺️ Roadmap (Future Features)
 
